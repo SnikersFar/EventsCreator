@@ -10,7 +10,6 @@ builder.Services.AddDbContext<WebContext>();
 builder.Services.AddScoped<EventRepository>();
 builder.Services.AddControllers();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,14 +26,13 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
-
-app.MapRazorPages();
-
-app.Run();
-
+    
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller}/{action}/{id?}");
 });
+
+app.Run();
+
