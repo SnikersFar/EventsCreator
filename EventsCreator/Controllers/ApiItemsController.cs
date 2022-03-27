@@ -21,7 +21,7 @@ namespace EventsCreator.Controllers
         [HttpPost]
         public void Add(Event model)
         {
-            if(model != null)
+            if(model != null && model.Id <= 0)
             {
                 _eventRepository.Save(model);
             }
@@ -33,7 +33,14 @@ namespace EventsCreator.Controllers
             if(model == null || _eventRepository.Get(model.Id) == null)
             return NotFound();
 
-            _eventRepository.Save(model);
+            var OldModel = _eventRepository.Get(model.Id);
+            
+            OldModel.Speaker = model.Speaker;
+            OldModel.NameOfEvent = model.NameOfEvent;
+            OldModel.Description = model.Description;
+            OldModel.EventTime = model.EventTime;
+
+            _eventRepository.Save(OldModel);
             return Ok();
         }
         [HttpDelete]
