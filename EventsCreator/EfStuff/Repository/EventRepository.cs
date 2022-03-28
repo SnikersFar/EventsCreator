@@ -1,5 +1,8 @@
 ﻿using EventsCreator.EfStuff.DbModel;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace EventsCreator.EfStuff.Repository
 {
@@ -23,6 +26,36 @@ namespace EventsCreator.EfStuff.Repository
         {
             return _dbSet.ToList();
         }
+        public List<Event>GetByFilter(int perPage, int page, string searchName, string filtColumnName)
+        {
+            List<Event> filtList;
+            Type TypeEvent = typeof(Event);
+            if (TypeEvent.GetProperty("filtColumnName") != null)
+            {
+                var table = Expression.Parameter(typeof(Event), "event");
+                var ListOfProperty = filtColumnName.Split(".");
+                var member = Expression.Property(table, ListOfProperty[0]);
+                for (int i = 1; i < ListOfProperty.Length; i++)
+                {
+                    var item = ListOfProperty[i];
+                    var next = Expression.Property(member, item);
+                    member = next;
+
+                }
+                var condition = Expression.Lambda<Func<Event, object>>(Expression.Convert(member, typeof(object)), table);
+
+                filtList = _dbSet.OrderBy(condition).ToList();
+            } else
+            {
+                filtList = _dbSet.ToList();
+            }
+            
+            filtList = filtList.Where(e => e.NameOfEvent.Contains(searchName)).ToList();
+            filtList = GetForPagination(filtList, perPage, page);
+
+
+            return filtList;
+        }
 
         public void Save(Event model)
         {
@@ -38,14 +71,22 @@ namespace EventsCreator.EfStuff.Repository
         }
         public void Remove(long id)
         {
-            if(Get(id) != null)
+            if (Get(id) != null)
             {
                 _dbSet.Remove(Get(id));
                 _webContext.SaveChanges();
-            } else
-            {
-                throw new ArgumentNullException("item");
             }
         }
+        public List<Event> GetForPagination(int perPage, int page)
+        => _dbSet
+            .Skip((page - 1) * perPage)
+            .Take(perPage)
+            .ToList();
+
+        private List<Event> GetForPagination(List<Event> events, int perPage, int page)
+            => events
+            .Skip((page - 1) * perPage)
+            .Take(perPage)
+            .ToList();
     }
 }
