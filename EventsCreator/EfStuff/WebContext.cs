@@ -13,7 +13,8 @@ namespace EventsCreator.EfStuff
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            modelBuilder.Entity<User>().HasMany(u => u.CreatedEvents).WithOne(e => e.Creator);
+            modelBuilder.Entity<User>().HasMany(u => u.InvitedEvents).WithMany(e => e.Participants);
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

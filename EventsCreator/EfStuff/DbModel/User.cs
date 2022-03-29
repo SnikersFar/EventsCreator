@@ -9,5 +9,10 @@ namespace EventsCreator.EfStuff.DbModel
         [JsonIgnore]
         public string Password { get; set; }
         public string Info { get; set; }
+        [JsonIgnore]
+        public List<Event> CreatedEvents { get; set; }
+        [JsonIgnore]
+        public List<Event> InvitedEvents { get; set; }
+
     }
 }

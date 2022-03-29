@@ -49,13 +49,56 @@ namespace EventsCreator.Controllers
 
         [Authorize]
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetEvents()
         {
             var Me = (User)HttpContext.Items["User"];
-            var users = _userRepository.GetAll();
-            return Ok(Me);
-        }
 
+            return Ok(Me.CreatedEvents);
+        }
+        [Authorize]
+        [HttpPost]
+        public IActionResult InvitedInEvent(long eventId)
+        {
+            var Me = (User)HttpContext.Items["User"];
+
+            var Event = _eventRepository.Get(eventId);
+            if (Event == null)
+            {
+                return NotFound();
+            }
+            if (Event.Participants.Any(u => u.Id == Me.Id))
+            {
+                return StatusCode(304);
+            }
+            Event.Participants.Add(Me);
+            _eventRepository.Save(Event);
+
+
+            return Ok();
+        }
+        [Authorize]
+        [HttpPost]
+        public IActionResult CreateEvenet(EventViewModel viewEvent)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(viewEvent);
+            }
+
+            var Event = new Event()
+            {
+                Creator = (User)HttpContext.Items["User"],
+                Speaker = viewEvent.Speaker,
+                Description = viewEvent.Description,
+                EventTime = viewEvent.EventTime,
+                NameOfEvent = viewEvent.NameOfEvent,
+                Participants = new List<User>(),
+            };
+            _eventRepository.Save(Event);
+
+            return Ok();
+
+        }
 
     }
 }

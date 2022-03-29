@@ -7,5 +7,7 @@
         public string? Description { get; set; }
         public string? Speaker {  get; set; }
         public DateTime EventTime { get; set; }
+        public virtual List<User> Participants { get; set; }
+        public virtual User Creator { get; set; }
     }
 }
