@@ -1,6 +1,10 @@
 using EventsCreator.EfStuff;
 using EventsCreator.EfStuff.Repository;
+using EventsCreator.Helpers;
+using EventsCreator.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +12,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<WebContext>();
 builder.Services.AddScoped<EventRepository>();
+builder.Services.AddScoped<UserRepository>();
 builder.Services.AddControllers();
+
+builder.Services.AddScoped<UserService>(x => {
+
+    var userRepository = x.GetService<UserRepository>();
+    var configuration = builder.Configuration;
+
+    return new UserService(userRepository, configuration);
+
+});
 
 var app = builder.Build();
 
@@ -25,7 +39,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
+app.UseMiddleware<JwtMiddleware>();
     
 app.UseEndpoints(endpoints =>
 {

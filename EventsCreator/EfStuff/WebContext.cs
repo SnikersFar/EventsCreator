@@ -6,6 +6,7 @@ namespace EventsCreator.EfStuff
     public class WebContext : DbContext
     {
         public DbSet<Event> Events { get; set; }
+        public DbSet<User> Users { get; set; }
         public WebContext(DbContextOptions options) : base(options)
         {
 
