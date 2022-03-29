@@ -12,9 +12,9 @@ namespace EventsCreator.EfStuff.DbModel
         public string Info { get; set; }
         public Role Role { get; set; }
         [JsonIgnore]
-        public List<Event> CreatedEvents { get; set; }
+        public virtual List<Event> CreatedEvents { get; set; }
         [JsonIgnore]
-        public List<Event> InvitedEvents { get; set; }
+        public virtual List<Event> InvitedEvents { get; set; }
 
     }
 }

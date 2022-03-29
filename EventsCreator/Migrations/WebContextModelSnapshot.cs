@@ -30,6 +30,9 @@ namespace EventsCreator.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("CreatorId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -44,6 +47,8 @@ namespace EventsCreator.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Events");
                 });
@@ -68,9 +73,58 @@ namespace EventsCreator.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("EventUser", b =>
+                {
+                    b.Property<long>("InvitedEventsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ParticipantsId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("InvitedEventsId", "ParticipantsId");
+
+                    b.HasIndex("ParticipantsId");
+
+                    b.ToTable("EventUser");
+                });
+
+            modelBuilder.Entity("EventsCreator.EfStuff.DbModel.Event", b =>
+                {
+                    b.HasOne("EventsCreator.EfStuff.DbModel.User", "Creator")
+                        .WithMany("CreatedEvents")
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("EventUser", b =>
+                {
+                    b.HasOne("EventsCreator.EfStuff.DbModel.Event", null)
+                        .WithMany()
+                        .HasForeignKey("InvitedEventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EventsCreator.EfStuff.DbModel.User", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EventsCreator.EfStuff.DbModel.User", b =>
+                {
+                    b.Navigation("CreatedEvents");
                 });
 #pragma warning restore 612, 618
         }
