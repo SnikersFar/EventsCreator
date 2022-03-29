@@ -43,6 +43,7 @@ namespace EventsCreator.Services
                 Info = userModel.Info,
                 Login = userModel.Username,
                 Password = userModel.Password,
+                Role = EfStuff.DbModel.Enums.Role.user,
                 
             };
 

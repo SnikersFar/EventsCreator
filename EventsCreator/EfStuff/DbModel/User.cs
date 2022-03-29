@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using EventsCreator.EfStuff.DbModel.Enums;
+using System.Text.Json.Serialization;
 
 namespace EventsCreator.EfStuff.DbModel
 {
@@ -9,6 +10,7 @@ namespace EventsCreator.EfStuff.DbModel
         [JsonIgnore]
         public string Password { get; set; }
         public string Info { get; set; }
+        public Role Role { get; set; }
         [JsonIgnore]
         public List<Event> CreatedEvents { get; set; }
         [JsonIgnore]

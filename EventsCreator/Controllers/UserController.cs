@@ -1,4 +1,6 @@
-﻿using EventsCreator.EfStuff.DbModel;
+﻿using EventsCreator.Controllers.Attributes;
+using EventsCreator.EfStuff.DbModel;
+using EventsCreator.EfStuff.DbModel.Enums;
 using EventsCreator.EfStuff.Repository;
 using EventsCreator.Helpers;
 using EventsCreator.Models;
@@ -76,10 +78,13 @@ namespace EventsCreator.Controllers
 
             return Ok();
         }
-        [Authorize]
+
         [HttpPost]
+        [Authorize]
+        [UserAccess(Role.admin)]
         public IActionResult CreateEvenet(EventViewModel viewEvent)
         {
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(viewEvent);
