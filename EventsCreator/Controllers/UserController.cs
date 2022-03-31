@@ -15,8 +15,9 @@ using System.Text;
 
 namespace EventsCreator.Controllers
 {
+
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
         private readonly UserRepository _userRepository;
         private readonly EventRepository _eventRepository;
@@ -29,8 +30,8 @@ namespace EventsCreator.Controllers
             _eventRepository = eventRepository;
             _configuration = configuration;
         }
+        
         [HttpPost]
-        [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var user = _userRepository.GetAll().SingleOrDefault(u => u.Login == model.Username);
@@ -67,7 +68,7 @@ namespace EventsCreator.Controllers
             return Unauthorized();
         }
         [HttpPost]
-        [Route("register")]
+
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var userExists = _userRepository.GetAll().SingleOrDefault(u => u.Login == model.Username);
@@ -105,7 +106,7 @@ namespace EventsCreator.Controllers
         }
 
         [HttpPost]
-        [Route("register-admin")]
+
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
         {
             var userExists = _userRepository.GetAll().SingleOrDefault(u => u.Login == model.Username);
@@ -143,7 +144,7 @@ namespace EventsCreator.Controllers
         }
 
         [HttpPost]
-        [Route("refresh-token")]
+
         public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
         {
             if (tokenModel is null)
@@ -185,7 +186,7 @@ namespace EventsCreator.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("revoke/{username}")]
+
         public async Task<IActionResult> Revoke(string username)
         {
             var user = _userRepository.GetAll().SingleOrDefault(u => u.Login == username);
