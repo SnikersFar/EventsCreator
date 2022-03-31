@@ -104,6 +104,40 @@ namespace EventsCreator.Controllers
             return Ok();
 
         }
+        [HttpPost]
+        [Authorize]
+        [UserAccess(Role.admin)]
+        public IActionResult DeleteEvenet(long EventId)
+        {
+            var MyEvent = _eventRepository.Get(EventId);
+            if (MyEvent == null)
+                return NotFound();
+
+            _eventRepository.Remove(EventId);
+
+            return Ok();
+
+        }
+        [HttpPost]
+        [Authorize]
+        [UserAccess(Role.admin)]
+        public IActionResult ChangeEvent(EventViewModel viewEvent)
+        {
+            if (!ModelState.IsValid || viewEvent.Id <= 0 || _eventRepository.Get(viewEvent.Id) == null)
+            {
+                return BadRequest(viewEvent);
+            }
+            var myEvent = _eventRepository.Get(viewEvent.Id);
+            
+            myEvent.NameOfEvent = viewEvent.NameOfEvent;
+            myEvent.Speaker = viewEvent.Speaker;
+            myEvent.EventTime = viewEvent.EventTime;
+            myEvent.Description = viewEvent.Description;
+            _eventRepository.Save(myEvent);
+
+            return Ok();
+
+        }
 
     }
 }

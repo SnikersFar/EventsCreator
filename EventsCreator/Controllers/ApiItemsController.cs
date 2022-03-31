@@ -41,9 +41,10 @@ namespace EventsCreator.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public IHttpActionResult Change(Event model)
         {
-            if(model == null || _eventRepository.Get(model.Id) == null)
+            if (model == null || _eventRepository.Get(model.Id) == null || .Id != _eventRepository.Get(model.Id).Creator.Id)
             return NotFound();
 
             var OldModel = _eventRepository.Get(model.Id);
