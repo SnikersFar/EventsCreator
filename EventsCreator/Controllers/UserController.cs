@@ -49,14 +49,7 @@ namespace EventsCreator.Controllers
             return Ok(response);
         }
 
-        [Authorize]
-        [HttpGet]
-        public IActionResult GetEvents()
-        {
-            var Me = (User)HttpContext.Items["User"];
 
-            return Ok(Me.CreatedEvents);
-        }
         [Authorize]
         [HttpPost]
         public IActionResult InvitedInEvent(long eventId)
@@ -104,7 +97,7 @@ namespace EventsCreator.Controllers
             return Ok();
 
         }
-        [HttpPost]
+        [HttpDelete]
         [Authorize]
         [UserAccess(Role.admin)]
         public IActionResult DeleteEvenet(long EventId)
@@ -118,7 +111,7 @@ namespace EventsCreator.Controllers
             return Ok();
 
         }
-        [HttpPost]
+        [HttpPut]
         [Authorize]
         [UserAccess(Role.admin)]
         public IActionResult ChangeEvent(EventViewModel viewEvent)

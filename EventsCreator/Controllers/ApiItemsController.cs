@@ -31,34 +31,10 @@ namespace EventsCreator.Controllers
             return filterList;
         }
 
-        [HttpPost]
-        public void Add(Event model)
-        {
-            if(model != null && model.Id <= 0)
-            {
-                _eventRepository.Save(model);
-            }
-        }
 
-        [HttpPut]
-        [Authorize]
-        public IHttpActionResult Change(Event model)
-        {
-            if (model == null || _eventRepository.Get(model.Id) == null || .Id != _eventRepository.Get(model.Id).Creator.Id)
-            return NotFound();
 
-            var OldModel = _eventRepository.Get(model.Id);
-            
-            OldModel.Speaker = model.Speaker;
-            OldModel.NameOfEvent = model.NameOfEvent;
-            OldModel.Description = model.Description;
-            OldModel.EventTime = model.EventTime;
 
-            _eventRepository.Save(OldModel);
-            return Ok();
-        }
-        [HttpDelete]
-        public void Delete(long id) => _eventRepository.Remove(id);
+
 
     }
 }
