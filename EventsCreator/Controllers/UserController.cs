@@ -16,7 +16,7 @@ using System.Text;
 namespace EventsCreator.Controllers
 {
 
-    [ApiController]
+
     public class UserController : Controller
     {
         private readonly UserRepository _userRepository;
@@ -32,7 +32,7 @@ namespace EventsCreator.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login( LoginModel model)
         {
             var user = _userRepository.GetAll().SingleOrDefault(u => u.Login == model.Username);
             if (user != null && user.Password == model.Password)
@@ -54,7 +54,7 @@ namespace EventsCreator.Controllers
                 _ = int.TryParse(_configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
 
                 user.RefreshToken = refreshToken;
-                user.RefreshTokenExpiryTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
+                user.RefreshTokenTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
 
                 _userRepository.Save(user);
 
@@ -69,7 +69,7 @@ namespace EventsCreator.Controllers
         }
         [HttpPost]
 
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register( RegisterModel model)
         {
             var userExists = _userRepository.GetAll().SingleOrDefault(u => u.Login == model.Username);
             if (userExists != null)
@@ -166,7 +166,7 @@ namespace EventsCreator.Controllers
 
             var user =  _userRepository.GetAll().SingleOrDefault(u => u.Login == username);
 
-            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenTime <= DateTime.Now)
             {
                 return BadRequest("Invalid access token or refresh token");
             }
@@ -175,7 +175,10 @@ namespace EventsCreator.Controllers
             var newRefreshToken = GenerateRefreshToken();
 
             user.RefreshToken = newRefreshToken;
+
+            
             _userRepository.Save(user);
+
 
             return new ObjectResult(new
             {

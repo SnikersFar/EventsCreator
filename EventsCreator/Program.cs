@@ -15,7 +15,7 @@ builder.Services.AddDbContext<WebContext>();
 builder.Services.AddScoped<EventRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddControllers();
-
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 
 builder.Services.AddScoped<UserService>(x => {
