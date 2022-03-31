@@ -5,6 +5,9 @@ using EventsCreator.EfStuff.Repository;
 using EventsCreator.Helpers;
 using EventsCreator.Models;
 using EventsCreator.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Sailora.Identity.Models;
@@ -41,11 +44,11 @@ namespace EventsCreator.Controllers
 
                 var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.Login),
+                    new Claim("Login", user.Login),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole.ToString()));
+                authClaims.Add(new Claim("Role", userRole.ToString()));
 
 
                 var token = CreateToken(authClaims);
@@ -246,47 +249,37 @@ namespace EventsCreator.Controllers
 
         }
 
-        //[HttpPost]
-        //public IActionResult Authenticate(AuthenticateRequest model)
-        //{
-        //    var response = _userService.Authenticate(model);
-
-        //    if (response == null)
-        //        return BadRequest(new { message = "Username or password is incorrect" });
-
-        //    return Ok(response);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Register(UserModel userModel)
-        //{
-        //    var response = await _userService.Register(userModel);
-
-        //    if (response == null)
-        //    {
-        //        return BadRequest(new { message = "Didn't register!" });
-        //    }
-
-        //    return Ok(response);
-        //}
 
 
         [Authorize]
         [HttpPost]
-        public IActionResult InvitedInEvent(long eventId)
+        public IActionResult InvitedInEvent(long eventId, string token)
         {
-            var Me = (User)HttpContext.Items["User"];
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+
+            
+            var MeUser = _userRepository.GetAll().SingleOrDefault(x => x.Login == User.FindFirstValue("Login"));
 
             var Event = _eventRepository.Get(eventId);
             if (Event == null)
             {
                 return NotFound();
             }
-            if (Event.Participants.Any(u => u.Id == Me.Id))
+            if (Event.Participants.Any(u => u.Id == MeUser.Id))
             {
                 return StatusCode(304);
             }
-            Event.Participants.Add(Me);
+            Event.Participants.Add(MeUser);
             _eventRepository.Save(Event);
 
 
@@ -303,10 +296,10 @@ namespace EventsCreator.Controllers
             {
                 return BadRequest(viewEvent);
             }
-
+            var MeUser = _userRepository.GetAll().SingleOrDefault(x => x.Login == User.FindFirstValue("Login"));
             var Event = new Event()
             {
-                Creator = (User)HttpContext.Items["User"],
+                Creator = MeUser,
                 Speaker = viewEvent.Speaker,
                 Description = viewEvent.Description,
                 EventTime = viewEvent.EventTime,

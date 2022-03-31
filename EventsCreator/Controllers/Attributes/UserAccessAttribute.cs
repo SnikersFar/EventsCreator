@@ -16,15 +16,17 @@ namespace EventsCreator.Controllers.Attributes
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var user = (User)context.HttpContext.Items["User"];
-
-            if (user == null)
+            var infoRole = context.HttpContext.User.FindFirst("Role").Value;
+            if (infoRole == null)
             {
                 context.Result = new UnauthorizedResult();
                 return;
             }
 
-            if (!Roles.Any(r => user.Role == r))
+            var Role = (Role)Enum.Parse(typeof(Role), infoRole);
+
+
+            if (!Roles.Any(r => Role == r))
             {
                 context.Result = new ForbidResult();
 
